@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-class LinearRegression():
+class SimpleLinearRegression():
     def __init__(self, x: pd.Series, y: pd.Series):
         # Computing for intercept
         n = x.size
