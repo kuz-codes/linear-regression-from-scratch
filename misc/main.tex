@@ -1,0 +1,130 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm, hanging, parskip}
+\usepackage[margin=1in]{geometry}
+
+
+\title{The Theory Behind Simple Linear Regression - Method of Least Squares}
+\author{Markus}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+The idea behind simple linear regression (SLR) is that in the population, each instance of a certain observed phenomenon has a relationship with some predictor $X$ which can be described by the formula:
+
+$$Y_i = \beta_0 + \beta_1X_i + \varepsilon_i$$
+
+where each of the $\varepsilon_i$'s represent some error with the assumption that $\varepsilon \sim N(0, \sigma^2)$ i.e. the $\varepsilon_i$'s follow a normal distribution with mean $0$ and constant variance. The goal is to use the sample to estimate the values of the parameters $\beta_0$ and $\beta_1$. The most common way to do this is to use the method of least squares.
+
+\section{Least Squares Method}
+Let us go back to the previous equation that I showed.
+
+$$Y_i = \beta_0 + \beta_1X_i + \varepsilon_i$$
+
+After doing some simple algebra, we get the following:
+
+$$\varepsilon_i = Y_i - (\beta_0 + \beta_1X_i )$$
+
+which looks exactly like the intuitive formula that one might expect when computing for error/deviation, that is, error = actual - estimated. Now, some of these $\varepsilon_i$'s will be negative because some of the predictions may be overestimated (actual < estimated), so let's go ahead and square both sides of this equation to make them all positive. 
+
+$$\varepsilon_i^2 = (Y_i - (\beta_0 + \beta_1X_i ))^2$$
+
+Remember that this equation is just the squared-error of a single prediction, our next step is to add up all of these squared-errors.
+
+$$\sum_{i=0}^n\varepsilon_i^2 = \sum_{i=0}^n(Y_i - (\beta_0 + \beta_1X_i ))^2$$
+This now gives us the total squared-error of all the data points. If we wish to make a good model, we want it to be as accurate as possible, in other words, we want to \textbf{minimize} this sum of squared-errors. This is why it's important that we squared both sides of the equation, if we had retained the signs of the $\varepsilon_i$'s, then adding all the positive $\varepsilon_i$'s and the negative $\varepsilon_i$'s would have lowered the magnitude of the total error, affecting our evaluation of how accurate the model actually is. If you're curious why we don't just use the absolute values, remember that the absolute value function is piece-wise defined as:
+
+$$|x| = \begin{cases}
+    x&, x \geq 0 \\
+    -x&, x < 0
+\end{cases}$$
+
+which will complicate the entire computation. Going back, our goal is to minimize the sum of squared errors by figuring out what the parameters $\beta_0$ and $\beta_1$ should be. I'll rename the sum of squared errors as the variable $Q$ so we now have $Q = \sum_{i=0}^n \varepsilon_i^2$. As you may have expected, because we are trying to minimize a function with respect to two variables, this calculation would involve partial derivatives. More specifically, we want the following:
+
+$$\begin{cases}
+        \displaystyle\frac{\partial Q}{\partial \beta_0} &= 0\\
+        \displaystyle\frac{\partial Q}{\partial \beta_1} &= 0
+    \end{cases}$$
+    \section{Calculation}
+    \begin{align*}
+        Q &= \sum_{i=0}^n(Y_i - (\beta_0 + \beta_1X_i ))^2 \\
+        &= \sum_{i=0}^n(Y_i - \beta_0 - \beta_1X_i )^2 \\
+        \frac{\partial Q}{\partial \beta_0}&=  \frac{\partial}{\partial \beta_0}\sum_{i=0}^n(Y_i - \beta_0 - \beta_1X_i )^2 \\
+        &=  \sum_{i=0}^n\frac{\partial}{\partial \beta_0}(Y_i - \beta_0 - \beta_1X_i )^2  \\
+        &=  \sum_{i=0}^{n}2(Y_i - \beta_0 - \beta_1X_i )\frac{\partial}{\partial \beta_0}(Y_i - \beta_0 - \beta_1X_i ) \\
+          &=  \sum_{i=0}^{n}-2(Y_i - \beta_0 - \beta_1X_i ) \\
+          &=  \sum_{i=0}^{n}-2Y_i + 2\beta_0 +2\beta_1X_i \\
+&=  -2\sum_{i=0}^{n}Y_i + 2\sum_{i=0}^{n}\beta_0 +2\beta_1\sum_{i=0}^{n}X_i \\
+\frac{\partial Q}{\partial \beta_0} &=  -2\sum_{i=0}^{n}Y_i + 2n\beta_0 +2\beta_1\sum_{i=0}^{n}X_i \\
+    \end{align*}
+    Now, we set $\displaystyle\frac{\partial Q}{\partial \beta_0} = 0$ and solve for $\beta_0$
+
+    \begin{align*}
+        0 &=  -2\sum_{i=0}^{n}Y_i + 2n\beta_0 +2\beta_1\sum_{i=0}^{n}X_i \\
+        2n\beta_0 &=  2\sum_{i=0}^{n}Y_i - 2\beta_1\sum_{i=0}^{n}X_i \\
+        n\beta_0 &= \sum_{i=0}^{n}Y_i - \beta_1\sum_{i=0}^{n}X_i \\
+            \beta_0 &= \frac{\displaystyle\sum_{i=0}^n Y_i}{n} - \beta_1\frac{\displaystyle\sum_{i=0}^n X_i}{n} \\
+    \end{align*}
+Doing the same thing for $\beta_1$,
+
+\begin{align*}
+     \frac{\partial Q}{\partial \beta_1}&=  \frac{\partial}{\partial \beta_1}\sum_{i=0}^n(Y_i - \beta_0 - \beta_1X_i )^2 \\
+     &=  \sum_{i=0}^n\frac{\partial}{\partial \beta_1}(Y_i - \beta_0 - \beta_1X_i )^2 \\
+     &=  \sum_{i=0}^{n}2(Y_i - \beta_0 - \beta_1X_i )\frac{\partial}{\partial \beta_1}(Y_i - \beta_0 - \beta_1X_i ) \\
+     &=  \sum_{i=0}^{n}-2X_i(Y_i - \beta_0 - \beta_1X_i ) \\
+     &=  \sum_{i=0}^{n}-2X_iY_i +2\beta_0X_i + 2\beta_1X_i^2  \\
+     &=  -2\sum_{i=0}^{n}X_iY_i +2\beta_0\sum_{i=0}^{n}X_i + 2\beta_1\sum_{i=0}^{n}X_i^2  \\
+    0 &=  -2\sum_{i=0}^{n}X_iY_i +2\beta_0\sum_{i=0}^{n}X_i + 2\beta_1\sum_{i=0}^{n}X_i^2  \\
+    0 &=  -\sum_{i=0}^{n}X_iY_i +\beta_0\sum_{i=0}^{n}X_i + \beta_1\sum_{i=0}^{n}X_i^2  \\
+    \beta_1 &= \frac{\displaystyle\sum_{i=0}^{n}X_iY_i -\beta_0\displaystyle\sum_{i=0}^{n}X_i}{\displaystyle\sum_{i=0}^{n}X_i^2}
+\end{align*}
+$$\begin{cases}
+        \beta_1 = \frac{\displaystyle\sum_{i=0}^{n}X_iY_i -\beta_0\displaystyle\sum_{i=0}^{n}X_i}{\displaystyle\sum_{i=0}^{n}X_i^2} \\
+        \beta_0 = \frac{\displaystyle\sum_{i=0}^n Y_i}{\displaystyle n} - \beta_1\frac{\displaystyle\sum_{i=0}^n X_i}{\displaystyle n} \\
+    \end{cases}$$
+    We now have a system of 2 equations for 2 unknowns. At this point, it gets really messy so just bear with me on this one. I'll also drop the bounds of the summation to make everything more compact. Solving for $\beta_0$:
+
+\begin{align*}
+    \beta_0 &= \frac{\sum Yi}{n} - \left(\frac{\sum{X_iY_i} -\beta_0\sum{X_i}}{\sum{X_i^2}}\right)\frac{\sum X_i}{n} \\
+    &= \frac{\sum Yi}{n} - \left(\frac{(\sum X_i)(\sum{X_iY_i}) -\beta_0(\sum{X_i})^2}{n\sum{X_i^2}}\right)\\
+    n\beta_0\left(\sum{X_i}\right)^2 &= \left(\sum{Y_i}\right) \left(\sum{X_i^2}\right) + \beta_0\left(\sum{X_i}\right)^2 - \left(\sum X_i\right)\left(\sum{X_iY_i}\right) \\
+    n\beta_0\left(\sum{X_i}\right)^2  - \beta_0\left(\sum{X_i}\right)^2&= \left(\sum{Y_i}\right) \left(\sum{X_i^2}\right) - \left(\sum X_i\right)\left(\sum{X_iY_i}\right) \\
+    \beta_0 &= \frac{\left(\sum{Y_i}\right) \left(\sum{X_i^2}\right) - \left(\sum X_i\right)\left(\sum{X_iY_i}\right)}{n\left(\sum{X_i}\right)^2  - \left(\sum{X_i}\right)^2}
+\end{align*}
+
+Now solving for $\beta_1$, 
+
+\begin{align*}
+    \beta_1 &=  \frac{\sum{X_iY_i} -\beta_0\sum{X_i}}{\sum{X_i^2}} \\
+    \beta_1 &=  \frac{\sum{X_iY_i} -\left(\frac{\sum Y_i}{n} - \beta_1 \frac{\sum{X_i}}{n}\right)\sum{X_i}}{\sum{X_i^2}} \\
+    \beta_1 &=  \frac{n\sum{X_iY_i} -\left(\sum Y_i - \beta_1 \sum{X_i}\right)\sum{X_i}}{n\sum{X_i^2}} \\
+    \beta_1 &=  \frac{n\sum{X_iY_i} -\left((\sum{X_i})(\sum Y_i) - \beta_1 (\sum{X_i})^2\right)}{n\sum{X_i^2}} \\
+    \beta_1 &=  \frac{n\sum{X_iY_i} + (\sum{X_i})(\sum Y_i) + \beta_1 (\sum{X_i})^2}{n\sum{X_i^2}} \\
+    n\beta_1\sum{X_i^2} &=n\sum{X_iY_i} + \left(\sum{X_i}\right)\left(\sum Y_i\right) + \beta_1 \left(\sum{X_i}\right)^2 \\
+    \beta_1 &= \frac{n\sum{X_iY_i} + \left(\sum{X_i}\right)\left(\sum Y_i\right)}{n\sum{X_i^2} - \left(\sum{X_i}\right)^2}
+\end{align*}
+This gives us the formulas for estimating $\beta_0$ and $\beta_1$. If you're doing this on paper or on the board, the last part may be easier to solve in matrix form via Gauss-Jordan reduction, but since I'm using LaTeX, that's just so much more work for me.
+
+Finally, to ensure that the values for the parameters we have found lead to a local minimum, we can use the determinant of the Hessian matrix. If this determinant is positive, then the point we have found is indeed a local minimum.
+
+
+\begin{align*}
+    \frac{\partial Q}{\partial \beta_1} &=   -2\sum_{i=0}^{n}X_iY_i +2\beta_0\sum_{i=0}^{n}X_i + 2\beta_1\sum_{i=0}^{n}X_i^2  \\
+    \frac{\partial^2 Q}{\partial \beta_1^2} &= 2\sum_{i=0}^{n}X_i^2  \\
+      \frac{\partial^2 Q}{\partial \beta_0 \partial \beta_1} &=   2\sum_{i=0}^{n}X_i\\
+\frac{\partial Q}{\partial \beta_0} &=  -2\sum_{i=0}^{n}Y_i + 2n\beta_0 +2\beta_1\sum_{i=0}^{n}X_i \\
+\frac{\partial^2 Q}{\partial \beta_0^2} &=  2n \\
+\frac{\partial^2 Q}{\partial \beta_1\partial \beta_0} &=   2\sum_{i=0}^{n}X_i
+\end{align*}
+
+\begin{align*}
+    \begin{vmatrix} \displaystyle\frac{\partial^2 Q}{\partial \beta_1^2} &  \displaystyle\frac{\partial^2 Q}{\partial \beta_0 \partial \beta_1} \\ \displaystyle\frac{\partial^2 Q}{\partial \beta_0 \partial \beta_1} & \displaystyle\frac{\partial^2 Q}{\partial \beta_0^2} \end{vmatrix}  &= 4n\sum_{i=0}^{n}X_i^2 - 4\left(\sum_{i=0}^{n}X_i\right)^2
+\end{align*}
+
+In checking that this determinant is indeed positive. I'll leave it up to the Python implementation in the Jupyter Notebook.
+
+\section{Summary}
+In this paper, I demonstrated the motivation of SLR and derived the formula using the method of least squares. In the introduction, We had an assumption: the probability distribution of the errors should follow $N(\mu, \sigma^2)$. There are several tests we can perform to check whether these assumptions are met, but those are outside the scope of this project.
+\end{document}
